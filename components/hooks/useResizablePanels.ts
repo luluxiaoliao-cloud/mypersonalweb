@@ -7,6 +7,7 @@ export type PanelSizes = {
   topLeftWidth: number;
   bottomLeftWidth: number;
   bottomRightTopHeight: number;
+  bottomRightMiddleHeight: number;
 };
 
 type DividerType =
@@ -14,6 +15,7 @@ type DividerType =
   | "vertical-top"
   | "vertical-bottom"
   | "horizontal-bottom-right"
+  | "horizontal-bottom-right-second"
   | null;
 
 const CONSTRAINTS = {
@@ -21,8 +23,10 @@ const CONSTRAINTS = {
   maxTopHeight: 40,
   minLeftWidth: 30,
   maxLeftWidth: 70,
-  minAboutHeight: 30,
-  maxAboutHeight: 70,
+  minAboutHeight: 25,
+  maxAboutHeight: 60,
+  minCertificatesHeight: 20,
+  maxCertificatesHeight: 50,
 };
 
 const LERP_FACTOR = 0.15;
@@ -31,7 +35,8 @@ const DEFAULT_SIZES: PanelSizes = {
   topHeight: 25,
   topLeftWidth: 55,
   bottomLeftWidth: 40,
-  bottomRightTopHeight: 60,
+  bottomRightTopHeight: 45,
+  bottomRightMiddleHeight: 35,
 };
 
 export function useResizablePanels(
@@ -82,6 +87,16 @@ export function useResizablePanels(
           CONSTRAINTS.maxAboutHeight,
           Math.max(CONSTRAINTS.minAboutHeight, newAboutHeight),
         );
+      } else if (isDragging === "horizontal-bottom-right-second") {
+        const topOffset = (targetSizes.current.topHeight / 100) * rect.height;
+        const bottomHeight = rect.height - topOffset;
+        const aboutHeight = (targetSizes.current.bottomRightTopHeight / 100) * bottomHeight;
+        const mouseY = e.clientY - rect.top - topOffset - aboutHeight;
+        const newCertificatesHeight = (mouseY / (bottomHeight - aboutHeight)) * 100;
+        targetSizes.current.bottomRightMiddleHeight = Math.min(
+          CONSTRAINTS.maxCertificatesHeight,
+          Math.max(CONSTRAINTS.minCertificatesHeight, newCertificatesHeight),
+        );
       }
     },
     [isDragging, containerRef],
@@ -124,6 +139,11 @@ export function useResizablePanels(
           bottomRightTopHeight: lerp(
             prev.bottomRightTopHeight,
             targetSizes.current.bottomRightTopHeight,
+            LERP_FACTOR,
+          ),
+          bottomRightMiddleHeight: lerp(
+            prev.bottomRightMiddleHeight,
+            targetSizes.current.bottomRightMiddleHeight,
             LERP_FACTOR,
           ),
         };

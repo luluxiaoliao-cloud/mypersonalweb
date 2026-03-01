@@ -5,7 +5,7 @@ import type { SiteData } from "@/data/types";
 import MobileLayout from "../components/MobileLayout";
 import LaptopLayout from "../components/LaptopLayout";
 
-type ExpandedSection = "work" | "about" | null;
+type ExpandedSection = "experience" | "about" | "certificates" | null;
 
 export default function ClientPage({ siteData }: { siteData: SiteData }) {
   const [expandedSection, setExpandedSection] = useState<ExpandedSection>(null);

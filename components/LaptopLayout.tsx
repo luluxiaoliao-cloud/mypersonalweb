@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef } from "react";
 import type { SiteData } from "@/data/types";
 import {
   HeroSection,
   SkillsSection,
-  WorkSection,
+  ExperienceSection,
   AboutSection,
   ContactSection,
+  CertificateAndHonorsSection,
   getClipFrom,
 } from "./sections";
 import { useResizablePanels, useEntryAnimation } from "./hooks";
@@ -15,8 +16,8 @@ import ExpandedOverlay from "./sections/ui/ExpandedOverlay";
 
 type ResizableLayoutProps = {
   siteData: SiteData;
-  expandedSection: "work" | "about" | null;
-  setExpandedSection: (section: "work" | "about" | null) => void;
+  expandedSection: "experience" | "about" | "certificates" | null;
+  setExpandedSection: (section: "experience" | "about" | "certificates" | null) => void;
 };
 
 export default function ResizableLayout({
@@ -28,18 +29,19 @@ export default function ResizableLayout({
   const [sourceRect, setSourceRect] = useState<DOMRect | null>(null);
 
   // Refs for panel containers (used to capture bounding rect for expansion)
-  const workPanelRef = useRef<HTMLDivElement>(null);
+  const experiencePanelRef = useRef<HTMLDivElement>(null);
   const aboutPanelRef = useRef<HTMLDivElement>(null);
+  const certificatesPanelRef = useRef<HTMLDivElement>(null);
 
-  const handleWorkExpand = useCallback(() => {
-    if (expandedSection === "work") {
+  const handleExperienceExpand = useCallback(() => {
+    if (expandedSection === "experience") {
       setExpandedSection(null);
     } else {
-      const rect = workPanelRef.current?.getBoundingClientRect();
+      const rect = experiencePanelRef.current?.getBoundingClientRect();
       if (rect) setSourceRect(rect);
-      setExpandedSection("work");
+      setExpandedSection("experience");
     }
-  }, [expandedSection]);
+  }, [expandedSection, setExpandedSection]);
 
   const handleAboutExpand = useCallback(() => {
     if (expandedSection === "about") {
@@ -49,7 +51,17 @@ export default function ResizableLayout({
       if (rect) setSourceRect(rect);
       setExpandedSection("about");
     }
-  }, [expandedSection]);
+  }, [expandedSection, setExpandedSection]);
+
+  const handleCertificatesExpand = useCallback(() => {
+    if (expandedSection === "certificates") {
+      setExpandedSection(null);
+    } else {
+      const rect = certificatesPanelRef.current?.getBoundingClientRect();
+      if (rect) setSourceRect(rect);
+      setExpandedSection("certificates");
+    }
+  }, [expandedSection, setExpandedSection]);
 
   const clipFrom = getClipFrom(sourceRect);
 
@@ -62,12 +74,14 @@ export default function ResizableLayout({
   const topVLineRef = useRef<HTMLDivElement>(null);
   const bottomVLineRef = useRef<HTMLDivElement>(null);
   const bottomRightHLineRef = useRef<HTMLDivElement>(null);
+  const bottomRightSecondHLineRef = useRef<HTMLDivElement>(null);
 
   // Animation refs for content
   const heroContentRef = useRef<HTMLDivElement>(null);
   const skillsContentRef = useRef<HTMLDivElement>(null);
-  const workContentRef = useRef<HTMLDivElement>(null);
+  const experienceContentRef = useRef<HTMLDivElement>(null);
   const aboutContentRef = useRef<HTMLDivElement>(null);
+  const certificatesContentRef = useRef<HTMLDivElement>(null);
   const contactContentRef = useRef<HTMLDivElement>(null);
 
   // Entry animation
@@ -77,12 +91,14 @@ export default function ResizableLayout({
       topVLine: topVLineRef,
       bottomVLine: bottomVLineRef,
       bottomRightHLine: bottomRightHLineRef,
+      bottomRightSecondHLine: bottomRightSecondHLineRef,
     },
     content: {
       hero: heroContentRef,
       skills: skillsContentRef,
-      work: workContentRef,
+      experience: experienceContentRef,
       about: aboutContentRef,
+      certificates: certificatesContentRef,
       contact: contactContentRef,
     },
   });
@@ -151,21 +167,21 @@ export default function ResizableLayout({
         />
       </div>
 
-      {/* ===== BOTTOM SECTION (Work | About + Contact) ===== */}
+      {/* ===== BOTTOM SECTION (Experience | About + Certificates + Contact) ===== */}
       <div
         className="absolute bottom-0 left-0 right-0 flex"
         style={{ height: `${bottomHeight}%` }}
       >
-        {/* Work Section (Left) */}
+        {/* Experience Section (Left) */}
         <div
-          ref={workPanelRef}
+          ref={experiencePanelRef}
           className="relative h-full overflow-auto"
           style={{ width: `${sizes.bottomLeftWidth}%` }}
         >
-          <div ref={workContentRef} className="h-full p-4">
-            <WorkSection
-              data={siteData.projectCategories}
-              onExpand={handleWorkExpand}
+          <div ref={experienceContentRef} className="h-full p-4">
+            <ExperienceSection
+              data={siteData.experienceCategories}
+              onExpand={handleExperienceExpand}
             />
           </div>
         </div>
@@ -185,7 +201,7 @@ export default function ResizableLayout({
           />
         </div>
 
-        {/* Right Section (About + Contact) */}
+        {/* Right Section (About + Certificates + Contact) */}
         <div
           className="relative h-full"
           style={{ width: `${100 - sizes.bottomLeftWidth}%` }}
@@ -204,7 +220,7 @@ export default function ResizableLayout({
             </div>
           </div>
 
-          {/* Horizontal Divider (About/Contact) */}
+          {/* Horizontal Divider (About / Certificates) */}
           <div
             className="group absolute left-0 right-0 z-10 flex h-0 cursor-row-resize items-center justify-center"
             style={{ top: `${sizes.bottomRightTopHeight}%` }}
@@ -220,10 +236,47 @@ export default function ResizableLayout({
             />
           </div>
 
+          {/* Certificates & Honors Section */}
+          <div
+            ref={certificatesPanelRef}
+            className="absolute left-0 right-0 overflow-auto"
+            style={{
+              top: `${sizes.bottomRightTopHeight}%`,
+              height: `${sizes.bottomRightMiddleHeight}%`
+            }}
+          >
+            <div ref={certificatesContentRef} className="h-full p-4">
+              <CertificateAndHonorsSection
+                data={siteData.certificateCategories}
+                onExpand={handleCertificatesExpand}
+              />
+            </div>
+          </div>
+
+          {/* Horizontal Divider (Certificates / Contact) */}
+          <div
+            className="group absolute left-0 right-0 z-10 flex h-0 cursor-row-resize items-center justify-center"
+            style={{
+              top: `${sizes.bottomRightTopHeight + sizes.bottomRightMiddleHeight}%`
+            }}
+            onMouseDown={handleMouseDown("horizontal-bottom-right-second")}
+          >
+            <div
+              ref={bottomRightSecondHLineRef}
+              className={`absolute h-px w-full origin-left bg-black ${
+                isDragging === "horizontal-bottom-right-second"
+                  ? "h-1 bg-gray-400"
+                  : "group-hover:h-1 group-hover:bg-gray-400"
+              }`}
+            />
+          </div>
+
           {/* Contact Section */}
           <div
             className="absolute bottom-0 left-0 right-0 overflow-auto"
-            style={{ height: `${100 - sizes.bottomRightTopHeight}%` }}
+            style={{
+              height: `${100 - sizes.bottomRightTopHeight - sizes.bottomRightMiddleHeight}%`
+            }}
           >
             <div ref={contactContentRef} className="h-full p-4">
               <ContactSection data={siteData.contact} />
@@ -234,14 +287,14 @@ export default function ResizableLayout({
 
       {/* Expanded overlays */}
       <ExpandedOverlay
-        isOpen={expandedSection === "work"}
+        isOpen={expandedSection === "experience"}
         clipFrom={clipFrom}
         padding="p-8"
-        uniqueKey="work-expanded"
+        uniqueKey="experience-expanded"
       >
-        <WorkSection
-          data={siteData.projectCategories}
-          onExpand={handleWorkExpand}
+        <ExperienceSection
+          data={siteData.experienceCategories}
+          onExpand={handleExperienceExpand}
           isExpanded={true}
         />
       </ExpandedOverlay>
@@ -255,6 +308,19 @@ export default function ResizableLayout({
         <AboutSection
           data={siteData.about}
           onExpand={handleAboutExpand}
+          isExpanded={true}
+        />
+      </ExpandedOverlay>
+
+      <ExpandedOverlay
+        isOpen={expandedSection === "certificates"}
+        clipFrom={clipFrom}
+        padding="p-8"
+        uniqueKey="certificates-expanded"
+      >
+        <CertificateAndHonorsSection
+          data={siteData.certificateCategories}
+          onExpand={handleCertificatesExpand}
           isExpanded={true}
         />
       </ExpandedOverlay>

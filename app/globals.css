@@ -165,4 +165,15 @@
   .highlighted-primary {
     @apply text-primary font-semibold;
   }
+
+  /* Photo animations */
+  .photo-clicked {
+    animation: photoClick 0.3s ease-out;
+  }
+
+  @keyframes photoClick {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+  }
 }

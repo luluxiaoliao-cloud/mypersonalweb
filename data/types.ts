@@ -10,10 +10,17 @@ export type SkillsData = {
   highlights: string[];
 };
 
+export type PhotoData = {
+  src: string;
+  alt: string;
+  direction: 'top' | 'bottom' | 'left' | 'right';
+};
+
 export type AboutData = {
   image: string;
   imageAlt: string;
   text: string;
+  photos?: PhotoData[]; // New property for photos - optional for backward compatibility
 };
 
 export type ContactEntry = {
@@ -22,16 +29,29 @@ export type ContactEntry = {
   href: string;
 };
 
-export type Project = {
+export type Experience = {
   title: string;
   image: string;
   techStack: string[];
   href?: string;
 };
 
-export type ProjectCategory = {
+export type ExperienceCategory = {
   category: string;
-  projects: Project[];
+  projects: Experience[];
+};
+
+export type Certificate = {
+  title: string;
+  image: string;
+  description: string;
+  date: string;
+  href?: string;
+};
+
+export type CertificateCategory = {
+  category: string;
+  certificates: Certificate[];
 };
 
 export type SiteData = {
@@ -39,5 +59,6 @@ export type SiteData = {
   skills: SkillsData;
   about: AboutData;
   contact: ContactEntry[];
-  projectCategories: ProjectCategory[];
+  experienceCategories: ExperienceCategory[];
+  certificateCategories: CertificateCategory[];
 };

@@ -4,7 +4,8 @@ import {
   skillsData,
   aboutData,
   contactData,
-  projectCategories,
+  experienceCategories,
+  certificateCategories,
 } from "@/data/content";
 import { client } from "@/sanity/lib/client";
 import { isSanityConfigured } from "@/sanity/env";
@@ -30,7 +31,8 @@ export async function getSiteData(): Promise<SiteData> {
       skills: skillsData,
       about: aboutData,
       contact: contactData,
-      projectCategories,
+      experienceCategories,
+      certificateCategories,
     };
   }
 
@@ -47,6 +49,7 @@ export async function getSiteData(): Promise<SiteData> {
     skills: skills ?? skillsData,
     about: about ?? aboutData,
     contact: contact?.entries ?? contactData,
-    projectCategories: categories?.length ? categories : projectCategories,
+    experienceCategories: categories?.length ? categories : experienceCategories,
+    certificateCategories,
   };
 }

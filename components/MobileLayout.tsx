@@ -5,9 +5,10 @@ import type { SiteData } from "@/data/types";
 import {
   HeroSection,
   SkillsSection,
-  WorkSection,
+  ExperienceSection,
   AboutSection,
   ContactSection,
+  CertificateAndHonorsSection,
   SectionHeading_Clickable,
   getClipFrom,
 } from "./sections";
@@ -15,8 +16,8 @@ import ExpandedOverlay from "./sections/ui/ExpandedOverlay";
 
 type MobileLayoutProps = {
   siteData: SiteData;
-  expandedSection: "work" | "about" | null;
-  setExpandedSection: (section: "work" | "about" | null) => void;
+  expandedSection: "experience" | "about" | "certificates" | null;
+  setExpandedSection: (section: "experience" | "about" | "certificates" | null) => void;
 };
 
 export default function MobileLayout({
@@ -26,17 +27,18 @@ export default function MobileLayout({
 }: MobileLayoutProps) {
   const [sourceRect, setSourceRect] = useState<DOMRect | null>(null);
 
-  const workRef = useRef<HTMLDivElement>(null);
+  const experienceRef = useRef<HTMLDivElement>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
+  const certificatesRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleWorkExpand = () => {
-    if (expandedSection === "work") {
+  const handleExperienceExpand = () => {
+    if (expandedSection === "experience") {
       setExpandedSection(null);
     } else {
-      const rect = workRef.current?.getBoundingClientRect();
+      const rect = experienceRef.current?.getBoundingClientRect();
       if (rect) setSourceRect(rect);
-      setExpandedSection("work");
+      setExpandedSection("experience");
     }
   };
 
@@ -50,6 +52,16 @@ export default function MobileLayout({
     }
   };
 
+  const handleCertificatesExpand = () => {
+    if (expandedSection === "certificates") {
+      setExpandedSection(null);
+    } else {
+      const rect = certificatesRef.current?.getBoundingClientRect();
+      if (rect) setSourceRect(rect);
+      setExpandedSection("certificates");
+    }
+  };
+
   const clipFrom = getClipFrom(sourceRect);
 
   return (
@@ -59,7 +71,7 @@ export default function MobileLayout({
         className="grid h-full"
         style={{
           gridTemplateRows:
-            "minmax(0, 2.5fr) minmax(0, 2.5fr) minmax(0, 0.7fr) minmax(0, 0.7fr) minmax(0, 1.5fr)",
+            "minmax(0, 2.5fr) minmax(0, 2.5fr) minmax(0, 0.7fr) minmax(0, 0.7fr) minmax(0, 0.7fr) minmax(0, 1.5fr)",
         }}
       >
         {/* Hero Section */}
@@ -72,15 +84,15 @@ export default function MobileLayout({
           <SkillsSection data={siteData.skills} />
         </div>
 
-        {/* Work Section */}
+        {/* Experience Section */}
         <div
-          ref={workRef}
+          ref={experienceRef}
           className="flex cursor-pointer items-center justify-between overflow-hidden border-b border-black bg-white px-6 transition-colors duration-200 hover:bg-gray-50"
         >
-          <SectionHeading_Clickable onClick={handleWorkExpand}>
-            Work
+          <SectionHeading_Clickable onClick={handleExperienceExpand}>
+            Experience
           </SectionHeading_Clickable>
-          <div onClick={handleWorkExpand} className="text-xl">
+          <div onClick={handleExperienceExpand} className="text-xl">
             +
           </div>
         </div>
@@ -98,6 +110,19 @@ export default function MobileLayout({
           </div>
         </div>
 
+        {/* Certificates & Honors Section */}
+        <div
+          ref={certificatesRef}
+          className="flex cursor-pointer items-center justify-between overflow-hidden border-b border-black bg-white px-6 transition-colors duration-200 hover:bg-gray-50"
+        >
+          <SectionHeading_Clickable onClick={handleCertificatesExpand}>
+            Certificates & Honors
+          </SectionHeading_Clickable>
+          <div onClick={handleCertificatesExpand} className="text-xl">
+            +
+          </div>
+        </div>
+
         {/* Contact Section */}
         <div className="overflow-hidden bg-white px-6 py-6">
           <ContactSection data={siteData.contact} />
@@ -106,13 +131,13 @@ export default function MobileLayout({
 
       {/* Expanded overlays */}
       <ExpandedOverlay
-        isOpen={expandedSection === "work"}
+        isOpen={expandedSection === "experience"}
         clipFrom={clipFrom}
-        uniqueKey="work-expanded"
+        uniqueKey="experience-expanded"
       >
-        <WorkSection
-          data={siteData.projectCategories}
-          onExpand={handleWorkExpand}
+        <ExperienceSection
+          data={siteData.experienceCategories}
+          onExpand={handleExperienceExpand}
           isExpanded={true}
         />
       </ExpandedOverlay>
@@ -125,6 +150,18 @@ export default function MobileLayout({
         <AboutSection
           data={siteData.about}
           onExpand={handleAboutExpand}
+          isExpanded={true}
+        />
+      </ExpandedOverlay>
+
+      <ExpandedOverlay
+        isOpen={expandedSection === "certificates"}
+        clipFrom={clipFrom}
+        uniqueKey="certificates-expanded"
+      >
+        <CertificateAndHonorsSection
+          data={siteData.certificateCategories}
+          onExpand={handleCertificatesExpand}
           isExpanded={true}
         />
       </ExpandedOverlay>

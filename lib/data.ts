@@ -53,5 +53,6 @@ export async function getSiteData(): Promise<SiteData> {
     contact: contact?.entries ?? contactData,
     experienceCategories: categories?.length ? categories : experienceCategories,
     certificateCategories,
+    education: educationData,
   };
 }

@@ -14,6 +14,7 @@ type AnimationRefs = {
   content: {
     hero: RefObject<HTMLDivElement | null>;
     skills: RefObject<HTMLDivElement | null>;
+    education: RefObject<HTMLDivElement | null>;
     experience: RefObject<HTMLDivElement | null>;
     about: RefObject<HTMLDivElement | null>;
     certificates: RefObject<HTMLDivElement | null>;
@@ -42,6 +43,7 @@ export function useEntryAnimation(refs: AnimationRefs) {
         [
           content.hero.current,
           content.skills.current,
+          content.education.current,
           content.experience.current,
           content.about.current,
           content.certificates.current,
@@ -87,6 +89,7 @@ export function useEntryAnimation(refs: AnimationRefs) {
           [
             content.hero.current,
             content.skills.current,
+            content.education.current,
             content.experience.current,
             content.about.current,
             content.certificates.current,

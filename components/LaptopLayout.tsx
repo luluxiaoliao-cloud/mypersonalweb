@@ -9,6 +9,7 @@ import {
   AboutSection,
   ContactSection,
   CertificateAndHonorsSection,
+  EducationSection,
   getClipFrom,
 } from "./sections";
 import { useResizablePanels, useEntryAnimation } from "./hooks";
@@ -16,8 +17,8 @@ import ExpandedOverlay from "./sections/ui/ExpandedOverlay";
 
 type ResizableLayoutProps = {
   siteData: SiteData;
-  expandedSection: "experience" | "about" | "certificates" | null;
-  setExpandedSection: (section: "experience" | "about" | "certificates" | null) => void;
+  expandedSection: "experience" | "about" | "certificates" | "skills" | "education" | null;
+  setExpandedSection: (section: "experience" | "about" | "certificates" | "skills" | "education" | null) => void;
 };
 
 export default function ResizableLayout({
@@ -32,6 +33,8 @@ export default function ResizableLayout({
   const experiencePanelRef = useRef<HTMLDivElement>(null);
   const aboutPanelRef = useRef<HTMLDivElement>(null);
   const certificatesPanelRef = useRef<HTMLDivElement>(null);
+  const skillsPanelRef = useRef<HTMLDivElement>(null);
+  const educationPanelRef = useRef<HTMLDivElement>(null);
 
   const handleExperienceExpand = useCallback(() => {
     if (expandedSection === "experience") {
@@ -63,6 +66,26 @@ export default function ResizableLayout({
     }
   }, [expandedSection, setExpandedSection]);
 
+  const handleSkillsExpand = useCallback(() => {
+    if (expandedSection === "skills") {
+      setExpandedSection(null);
+    } else {
+      const rect = skillsPanelRef.current?.getBoundingClientRect();
+      if (rect) setSourceRect(rect);
+      setExpandedSection("skills");
+    }
+  }, [expandedSection, setExpandedSection]);
+
+  const handleEducationExpand = useCallback(() => {
+    if (expandedSection === "education") {
+      setExpandedSection(null);
+    } else {
+      const rect = educationPanelRef.current?.getBoundingClientRect();
+      if (rect) setSourceRect(rect);
+      setExpandedSection("education");
+    }
+  }, [expandedSection, setExpandedSection]);
+
   const clipFrom = getClipFrom(sourceRect);
 
   // Use custom hooks for animation logic
@@ -73,12 +96,14 @@ export default function ResizableLayout({
   const mainHLineRef = useRef<HTMLDivElement>(null);
   const topVLineRef = useRef<HTMLDivElement>(null);
   const bottomVLineRef = useRef<HTMLDivElement>(null);
+  const bottomLeftHLineRef = useRef<HTMLDivElement>(null);
   const bottomRightHLineRef = useRef<HTMLDivElement>(null);
   const bottomRightSecondHLineRef = useRef<HTMLDivElement>(null);
 
   // Animation refs for content
   const heroContentRef = useRef<HTMLDivElement>(null);
   const skillsContentRef = useRef<HTMLDivElement>(null);
+  const educationContentRef = useRef<HTMLDivElement>(null);
   const experienceContentRef = useRef<HTMLDivElement>(null);
   const aboutContentRef = useRef<HTMLDivElement>(null);
   const certificatesContentRef = useRef<HTMLDivElement>(null);
@@ -96,6 +121,7 @@ export default function ResizableLayout({
     content: {
       hero: heroContentRef,
       skills: skillsContentRef,
+      education: educationContentRef,
       experience: experienceContentRef,
       about: aboutContentRef,
       certificates: certificatesContentRef,
@@ -142,11 +168,15 @@ export default function ResizableLayout({
 
         {/* Skills Section */}
         <div
+          ref={skillsPanelRef}
           className="relative h-full overflow-auto"
           style={{ width: `${100 - sizes.topLeftWidth}%` }}
         >
           <div ref={skillsContentRef} className="h-full p-4">
-            <SkillsSection data={siteData.skills} />
+            <SkillsSection
+              data={siteData.skills}
+              onExpand={handleSkillsExpand}
+            />
           </div>
         </div>
       </div>
@@ -167,22 +197,53 @@ export default function ResizableLayout({
         />
       </div>
 
-      {/* ===== BOTTOM SECTION (Experience | About + Certificates + Contact) ===== */}
+      {/* ===== BOTTOM SECTION (Education + Experience | About + Certificates + Contact) ===== */}
       <div
         className="absolute bottom-0 left-0 right-0 flex"
         style={{ height: `${bottomHeight}%` }}
       >
-        {/* Experience Section (Left) */}
+        {/* Left Column (Education + Experience) */}
         <div
-          ref={experiencePanelRef}
-          className="relative h-full overflow-auto"
+          className="relative h-full"
           style={{ width: `${sizes.bottomLeftWidth}%` }}
         >
-          <div ref={experienceContentRef} className="h-full p-4">
-            <ExperienceSection
-              data={siteData.experienceCategories}
-              onExpand={handleExperienceExpand}
+          {/* Education Section (Top Left) */}
+          <div
+            ref={educationPanelRef}
+            className="absolute left-0 right-0 top-0 overflow-auto"
+            style={{ height: `${sizes.bottomLeftTopHeight}%` }}
+          >
+            <div ref={educationContentRef} className="h-full p-4">
+              <EducationSection
+                data={siteData.education}
+                onExpand={handleEducationExpand}
+              />
+            </div>
+          </div>
+
+          {/* Divider between Education and Experience */}
+          <div
+            className="group absolute left-0 right-0 z-10 flex h-0 cursor-row-resize items-center justify-center"
+            style={{ top: `${sizes.bottomLeftTopHeight}%` }}
+          >
+            <div
+              ref={bottomLeftHLineRef}
+              className={`absolute h-px w-full origin-left bg-black group-hover:h-1 group-hover:bg-gray-400`}
             />
+          </div>
+
+          {/* Experience Section (Bottom Left) */}
+          <div
+            ref={experiencePanelRef}
+            className="absolute bottom-0 left-0 right-0 overflow-auto"
+            style={{ height: `${100 - sizes.bottomLeftTopHeight}%` }}
+          >
+            <div ref={experienceContentRef} className="h-full p-4">
+              <ExperienceSection
+                data={siteData.experienceCategories}
+                onExpand={handleExperienceExpand}
+              />
+            </div>
           </div>
         </div>
 
@@ -321,6 +382,32 @@ export default function ResizableLayout({
         <CertificateAndHonorsSection
           data={siteData.certificateCategories}
           onExpand={handleCertificatesExpand}
+          isExpanded={true}
+        />
+      </ExpandedOverlay>
+
+      <ExpandedOverlay
+        isOpen={expandedSection === "skills"}
+        clipFrom={clipFrom}
+        padding="p-8"
+        uniqueKey="skills-expanded"
+      >
+        <SkillsSection
+          data={siteData.skills}
+          onExpand={handleSkillsExpand}
+          isExpanded={true}
+        />
+      </ExpandedOverlay>
+
+      <ExpandedOverlay
+        isOpen={expandedSection === "education"}
+        clipFrom={clipFrom}
+        padding="p-8"
+        uniqueKey="education-expanded"
+      >
+        <EducationSection
+          data={siteData.education}
+          onExpand={handleEducationExpand}
           isExpanded={true}
         />
       </ExpandedOverlay>

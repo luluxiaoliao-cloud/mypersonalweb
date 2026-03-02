@@ -1,6 +1,7 @@
 import type { AboutData } from "@/data/types";
 import { CloseButton } from "./ui/CloseButton";
 import { SectionHeading_Clickable } from "./ui/SectionHeading_Clickable";
+import { HobbyCard } from "./ui/HobbyCard";
 
 type AboutSectionProps = {
   data: AboutData;
@@ -22,53 +23,77 @@ export function AboutSection({
 
   if (isExpanded) {
     return (
-      <div className="relative h-full overflow-hidden">
+      <div className="relative h-full overflow-auto">
         <CloseButton onClick={onExpand} />
 
-        {/* Photo Container - positioned absolutely in four directions */}
-        {data.photos && data.photos.length > 0 && (
-          <div className="absolute inset-0 pointer-events-none">
-            {data.photos.map((photo, index) => (
-              <div
-                key={index}
-                className={`absolute pointer-events-auto transition-all duration-300 ease-out ${
-                  photo.direction === 'top'
-                    ? 'top-8 left-1/2 -translate-x-1/2'
-                    : photo.direction === 'bottom'
-                    ? 'bottom-8 left-1/2 -translate-x-1/2'
-                    : photo.direction === 'left'
-                    ? 'left-8 top-1/2 -translate-y-1/2'
-                    : 'right-8 top-1/2 -translate-y-1/2'
-                }`}
-              >
+        <div className="max-w-5xl mx-auto px-6 py-8">
+          {/* 第一部分：个人介绍 */}
+          <section className="mb-12">
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              <div className="flex-shrink-0">
                 <img
-                  src={photo.src}
-                  alt={photo.alt}
-                  className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 object-cover rounded-xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl hover:rotate-2 cursor-pointer"
-                  onClick={(e) => handlePhotoClick(e, photo)}
+                  src={data.image}
+                  alt={data.imageAlt}
+                  className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 object-contain rounded-2xl shadow-xl"
                 />
               </div>
-            ))}
-          </div>
-        )}
+              <div className="flex-1 text-center md:text-left">
+                <h2 className="text-3xl font-bold mb-4">About Me</h2>
+                <p className="text-lg leading-relaxed text-gray-700">
+                  {data.text}
+                </p>
+              </div>
+            </div>
+          </section>
 
-        {/* Main Content */}
-        <div className="flex h-full flex-col md:flex-row md:items-center md:gap-12 lg:gap-12 m-12 sm:m-20 md:m-24">
-          <div className="flex shrink-0 items-center justify-center py-6 md:w-2/5 md:py-0">
-            <img
-              src={data.image}
-              alt={data.imageAlt}
-              className="h-48 w-48 object-contain sm:h-56 sm:w-56 md:h-72 md:w-72 lg:h-80 lg:w-80"
-            />
-          </div>
-          <div className="md:w-3/5">
-            <SectionHeading_Clickable onClick={onExpand}>
-              {`About Me`}
-            </SectionHeading_Clickable>
-            <p className="text-body leading-relaxed text-black md:text-lg md:leading-relaxed">
-              {data.text}
-            </p>
-          </div>
+          {/* 分隔线 */}
+          <div className="border-t border-gray-200 my-10"></div>
+
+          {/* 第二部分：个人照片展示 */}
+          {data.photos && data.photos.length > 0 && (
+            <section className="mb-12">
+              <h3 className="text-xl font-semibold mb-6 text-gray-800 flex items-center gap-2">
+                <span className="w-1 h-6 bg-black rounded"></span>
+                个人相册
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {data.photos.map((photo, index) => (
+                  <div key={index} className="aspect-square overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <img
+                      src={photo.src}
+                      alt={photo.alt}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
+                      onClick={(e) => handlePhotoClick(e, photo)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* 分隔线 */}
+          <div className="border-t border-gray-200 my-10"></div>
+
+          {/* 第三部分：兴趣爱好 */}
+          {data.hobbies && data.hobbies.length > 0 && (
+            <section>
+              <h3 className="text-xl font-semibold mb-6 text-gray-800 flex items-center gap-2">
+                <span className="w-1 h-6 bg-black rounded"></span>
+                兴趣爱好
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {data.hobbies.map((hobby, index) => (
+                  <HobbyCard
+                    key={index}
+                    name={hobby.name}
+                    description={hobby.description}
+                    image={hobby.image}
+                    images={hobby.images}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       </div>
     );

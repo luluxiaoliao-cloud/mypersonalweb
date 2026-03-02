@@ -6,6 +6,7 @@ export type PanelSizes = {
   topHeight: number;
   topLeftWidth: number;
   bottomLeftWidth: number;
+  bottomLeftTopHeight: number;
   bottomRightTopHeight: number;
   bottomRightMiddleHeight: number;
 };
@@ -35,6 +36,7 @@ const DEFAULT_SIZES: PanelSizes = {
   topHeight: 25,
   topLeftWidth: 55,
   bottomLeftWidth: 40,
+  bottomLeftTopHeight: 35,
   bottomRightTopHeight: 45,
   bottomRightMiddleHeight: 35,
 };
@@ -134,6 +136,11 @@ export function useResizablePanels(
           bottomLeftWidth: lerp(
             prev.bottomLeftWidth,
             targetSizes.current.bottomLeftWidth,
+            LERP_FACTOR,
+          ),
+          bottomLeftTopHeight: lerp(
+            prev.bottomLeftTopHeight,
+            targetSizes.current.bottomLeftTopHeight,
             LERP_FACTOR,
           ),
           bottomRightTopHeight: lerp(

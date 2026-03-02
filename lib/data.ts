@@ -6,6 +6,7 @@ import {
   contactData,
   experienceCategories,
   certificateCategories,
+  educationData,
 } from "@/data/content";
 import { client } from "@/sanity/lib/client";
 import { isSanityConfigured } from "@/sanity/env";
@@ -33,6 +34,7 @@ export async function getSiteData(): Promise<SiteData> {
       contact: contactData,
       experienceCategories,
       certificateCategories,
+      education: educationData,
     };
   }
 
